@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HTML5 Panorama Viewer</title>
+	
+	<script type="text/javascript">
+	
+	/*** 
+	* Author: Aditya Sankar
+	* Note: This code is provided "as-is" under a FreeBSD style (simplified) license. Please refer to
+	* 		http://www.cs.washington.edu/homes/aditya/files/photos/pano/license.txt for more information.
+	***/
+	
+	var supportsTouch = 'createTouch' in document; // Touch enabled device? 
+		
+	num_slices = supportsTouch ? 85 : 600; // Number of image slices. Less - better performance, More - better quality
+											// currently tuned towards performance on touch devices (mostly smartphones?)
+	
+	fov = 120;		// Horizontal field of view. About 120 degrees in humans.
+	fov_v = 75;		// Vertical field of view. About 75 degrees in humans.
+	scalefactor = 1;	// image scaling factor, used later.
+	var img, ctx, cnvs, height, width, currentpos = 0; // global references to the image, canvas and their attributes
+	
+	function bodyLoaded()
+	{
+		cnvs = document.getElementById("cv");
+		cnvs.width = window.innerWidth;
+		cnvs.height = window.innerHeight;
+		
+		
+		cnvs[supportsTouch ? 'ontouchstart' : 'onmousedown'] = startdrag; // attach event handlers (for either touch or click based interfaces)
+		cnvs[supportsTouch ? 'ontouchend' : 'onmouseup'] = enddrag;
+		ctx = cnvs.getContext("2d"); // get drawing context for canvas (used later)
+		
+		img = new Image();			// fetch image
+		img.onload = function (event)
+			{	// called once img has loaded
+				height = img.height;
+				width = img.width;
+				calibrate();	// calibrate scaling factor based on actual browser window size
+				redraw();
+			}
+		img.src = "http://www.cs.washington.edu/homes/aditya/files/photos/pano/mountains.jpeg";
+	}
+	
+	function redraw()
+	{
+		var segmentlength = (width/360.0)*(fov/num_slices);	//actual length of each image slice
+		var canvasused = 0.0
+		currentpos += delta/scalefactor;
+		
+		if (currentpos > width)	//code to reset the view after a full rotation has been completed
+			currentpos-= width;
+		if (currentpos < 0)
+			currentpos+= width;
+			
+		for (i=0; i<num_slices; i++)	//calculate projection for each slice
+		{
+			angle = 90-(fov/2-i*fov/num_slices);
+			if(angle > 90)
+				angle = 180-angle;
+			projectedlength = (segmentlength*cosec(angle));	// projected length of a slice is proportional to the cosecant of it's position in the FOV
+			
+			startpoint = currentpos + i*segmentlength;	// some bookkeeping
+			endpoint = startpoint + segmentlength;
+			
+			if (endpoint > width)
+				{
+					startpoint -= (width - segmentlength); // more reset code
+				}
+			
+			// The magic step! canvas.drawimage(image, sx, sy, sh, sw, dx, dy, dh, dw)	- s:source, d:destination, h:height, w:width	
+			// Redraws original image by reprojecting it onto the canvas based on the trigonometric math above.
+			ctx.drawImage(img, startpoint, 0, segmentlength, height, canvasused, height/2*(scalefactor*(cosec(90-fov/2) - cosec(angle))), scalefactor*projectedlength+1, height*scalefactor*cosec(angle));
+			// End of magic step
+			
+			canvasused += Math.round(scalefactor*projectedlength); // more bookkeeping
+		}
+		
+	}
+	
+	var mousepos;
+	var delta = 0;
+	
+	// Mouse Event Handlers
+	
+	function startdrag(e)
+	{
+		mousepos = e.pageX;
+		if (event.touches) mousepos = e.touches[0].pageX;
+		
+		cnvs[supportsTouch ? 'ontouchmove' : 'onmousemove']  = drag;
+	}
+	
+	function drag(e)
+	{
+		var pageX;
+		pageX = e.pageX;
+		if (event.touches) {event.preventDefault(); pageX = e.touches[0].pageX;}
+		
+		delta = mousepos - pageX;
+		mousepos = pageX;
+		redraw();
+	}
+	
+	function enddrag(e)
+	{
+		cnvs[supportsTouch ? 'ontouchmove' : 'onmousemove'] = null;		
+	}
+	
+	//Utility Functions
+	
+	function cosec(theta)
+	{
+		return 1/Math.sin(theta*Math.PI/180);
+	}
+	
+	window.onresize = function(event) {
+		calibrate();
+		redraw();
+	}
+	
+	function calibrate()
+	{
+		cnvs.width = window.innerWidth;
+		cnvs.height = window.innerHeight;
+		scalefactor = Math.min(cnvs.width/(2+(width/280.0*fov)), cnvs.height/height/2); // scale to fit
+	}
+	
+	</script>
+	
+</head>
+<body onload="bodyLoaded();" bgcolor="black">
+	<canvas id="cv"></canvas> 
+</body>
