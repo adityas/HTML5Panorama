@@ -21,6 +21,7 @@ Of course, the more slices there are, the better the panorama will look, but con
 Here’s a couple of demos I threw together. Click (or touch) and drag to pan:
 
 [Pantheon](http://www.cs.washington.edu/homes/aditya/files/photos/pano/pantheon.html)
+
 [La Roche Parstire](http://www.cs.washington.edu/homes/aditya/files/photos/pano/laroche.html)
 
 (Source images: [1](http://commons.wikimedia.org/wiki/File:Pantheon_Interior_360_Degree_Panorama.jpg), [2](http://www.olivewhite.com/shop/panoramas/360-from-la-roche-parstire-in-autumn/))
