@@ -2,14 +2,14 @@
 <html>
 <head>
     <title>HTML5 Panorama Viewer</title>
-    <script type="text/javascript" src="../js/HTML5Panorama.js"></script>
+    <script type="text/javascript" src="../dist/HTML5Panorama.min.js"></script>
     <script type="text/javascript">
         function init() {
             var cnvs = document.getElementById("cv");
             HTML5Panorama({
                 canvas: cnvs, // DOM Canvas Element
                 src: Math.random() <.5? "mountains.jpeg" : "pantheon.jpeg",
-                initialSpeed: 10, // move the image on load
+                initialSpeed: 0, // move the image on load
                 num_slices: ('ontouchstart' in window) ? 180 : 600,
                 silentDegradeQualityIfNeeded: true
             });
