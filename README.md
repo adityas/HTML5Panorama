@@ -26,6 +26,27 @@ Here’s a couple of demos I threw together. Click (or touch) and drag to pan:
 
 (Source images: [1](http://commons.wikimedia.org/wiki/File:Pantheon_Interior_360_Degree_Panorama.jpg), [2](http://www.olivewhite.com/shop/panoramas/360-from-la-roche-parstire-in-autumn/))
 
+Basic Usage
+=============
+
+    HTML5Panorama({
+        canvas  : "my_canvas_id", // id of canvas element or DOM Element
+        src     : "http://homes.cs.washington.edu/~aditya/files/photos/pano/mountains.jpeg", // source of image
+        num_slices : 500 // not mandatory. default "auto"
+    });
+
+Advanced Usage
+=============
+
+    HTML5Panorama({
+        canvas                       : document.getElementById("my_canvas_id"), // DOM Canvas Element
+        src                          : "http://homes.cs.washington.edu/~aditya/files/photos/pano/mountains.jpeg",
+        initialSpeed                 : 10, // move the image on load
+        num_slices                   : ('ontouchstart' in window)? 180 : 600,
+        silentDegradeQualityIfNeeded : true
+    });
+ 
+ 
 If you’re interested, feel free to delve into the source code and reuse/hack it as you see fit. Hopefully in the near future, I’ll add support for zoom, vertical panning, spherical projections and improve the overall performance.
 
 PS: Requires an HTML5 compatible browser (Chrome/Safari/Firefox/Opera). Works on the iPhone/iPad too.
